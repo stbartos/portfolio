@@ -197,15 +197,16 @@
    hero:  true u úvodní fotky
    ===================================================================== */
 const photos = [
-  { src: "", size: "wide", hero: true },
-  { src: "", size: "tall" },
-  { src: "", size: "" },
-  { src: "", size: "" },
-  { src: "", size: "" },
-  { src: "", size: "tall" },
-  { src: "", size: "wide" },
-  { src: "", size: "" },
-  { src: "", size: "" },
+  { src: "fotky/IMG_2911.jpg", size: "wide" },
+  { src: "fotky/IMG_3018.jpg", size: "", hero: true },
+  { src: "fotky/GP012293.jpg", size: "" },
+  { src: "fotky/IMG_2499.jpg", size: "" },
+  { src: "fotky/IMG_2758.jpg", size: "" },
+  { src: "fotky/IMG_2760.jpg", size: "" },
+  { src: "fotky/IMG_2838-5.jpeg", size: "wide" },
+  { src: "fotky/IMG_3360.jpg", size: "" },
+  { src: "fotky/IMG_3570.jpg", size: "" },
+  { src: "fotky/IMG_1161.jpeg", size: "" },
 ];
 
 const placeholder = i => {
@@ -226,7 +227,10 @@ photos.forEach((p, i) => {
   const b = document.createElement("button");
   b.className = `tile ${p.size || ""}`;
   b.setAttribute("aria-label", `Fotografie ${i + 1}`);
-  b.innerHTML = `<div class="img" style="background-image:${bg(p,i)}"></div>`;
+  const img = document.createElement("div");
+  img.className = "img";
+  img.style.backgroundImage = bg(p, i);
+  b.appendChild(img);
   b.addEventListener("click", () => openLightbox(i));
   grid.appendChild(b);
 });
