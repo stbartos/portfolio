@@ -99,7 +99,15 @@
     padding: 140px 28px;
     color: var(--muted);
   }
-  .video p { max-width: 40ch; }
+  .video-frame {
+    position: relative; aspect-ratio: 16/9;
+    max-width: 1280px; margin: 0 auto;
+    background: var(--bg-2);
+  }
+  .video-frame video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+  .video-caption { max-width: 1280px; margin: 14px auto 0; font-size: 13px; }
+  .video-caption a { border-bottom: 1px solid var(--line); transition: color .3s, border-color .3s; }
+  .video-caption a:hover { color: var(--text); border-color: var(--text); }
 
   /* ---------- Patička ---------- */
   footer {
@@ -159,7 +167,7 @@
   <a class="nav-name" href="#">Štěpán Bartoš</a>
   <div class="nav-links">
     <a href="#video">Video</a>
-    <a href="mailto:stepan@example.cz">Kontakt</a>
+    <a href="mailto:stepanbartos45@gmail.com">Kontakt</a>
   </div>
 </nav>
 
@@ -171,12 +179,19 @@
 <div class="grid" id="grid"></div>
 
 <section class="video" id="video">
-  <p>Video přibude během podzimu.</p>
+  <div class="video-frame">
+    <video src="video/klip.mp4" poster="video/klip.jpg"
+      autoplay muted loop playsinline preload="metadata"
+      aria-label="Guinness World Record — nejvíc loopingů v kluzáku"></video>
+  </div>
+  <p class="video-caption">
+    Guinness World Record — nejvíc loopingů v kluzáku ·
+    <a href="https://www.youtube.com/watch?v=Ktn5-dTVTmk" target="_blank" rel="noopener">Celé video</a>
+  </p>
 </section>
 
 <footer>
-  <a href="mailto:stepan@example.cz">stepan@example.cz</a>
-  <a href="https://instagram.com/" target="_blank" rel="noopener">Instagram</a>
+  <a href="mailto:stepanbartos45@gmail.com">stepanbartos45@gmail.com</a>
   <span>© 2026</span>
 </footer>
 
