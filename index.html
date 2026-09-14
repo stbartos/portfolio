@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Štěpán Bartoš</title>
+<meta name="description" content="Fotografie Štěpána Bartoše.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0D1117;
+    --bg-2: #12171F;
+    --text: #E6EAF0;
+    --muted: #7F8896;
+    --line: #1E242D;
+    --ease: cubic-bezier(.22,.61,.36,1);
+    --gap: 3px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Instrument Sans", system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration: none; }
+  :focus-visible { outline: 1px solid var(--text); outline-offset: 4px; }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+
+  /* ---------- Navigace ---------- */
+  .nav {
+    position: fixed; inset: 0 0 auto 0; z-index: 20;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 22px 28px;
+    mix-blend-mode: difference; color: #fff;
+  }
+  .nav a { color: #fff; }
+  .nav-name { font-weight: 500; }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a { opacity: .6; transition: opacity .3s; }
+  .nav-links a:hover { opacity: 1; }
+
+  /* ---------- Hero ---------- */
+  .hero { position: relative; height: 100svh; min-height: 520px; overflow: hidden; }
+  .hero-img {
+    position: absolute; inset: 0;
+    background-size: cover; background-position: center;
+    opacity: 0; transform: scale(1.04);
+    animation: heroIn 1.8s var(--ease) forwards;
+  }
+  @keyframes heroIn { to { opacity: 1; transform: none; } }
+  .hero-img::after {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(13,17,23,.85) 0%, rgba(13,17,23,0) 45%);
+  }
+  .hero h1 {
+    position: absolute; left: 28px; bottom: 32px;
+    font-size: clamp(44px, 9vw, 128px);
+    font-weight: 400; line-height: .95; letter-spacing: -.035em;
+    max-width: 9ch;
+    opacity: 0; animation: heroIn 1.2s .5s var(--ease) forwards;
+  }
+
+  /* ---------- Galerie ---------- */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--gap);
+    padding: var(--gap) 0;
+  }
+  .tile {
+    display: block; width: 100%; height: 100%;
+    background: var(--bg-2);
+    overflow: hidden;
+    aspect-ratio: 3/2;
+    opacity: 0; transform: translateY(14px);
+    transition: opacity 1s var(--ease), transform 1s var(--ease);
+  }
+  .tile.in { opacity: 1; transform: none; }
+  .tile.tall { grid-row: span 2; aspect-ratio: auto; }
+  .tile.wide { grid-column: span 2; aspect-ratio: auto; }
+  .tile .img {
+    width: 100%; height: 100%;
+    background-size: cover; background-position: center;
+    transition: transform 1.4s var(--ease), filter .8s var(--ease);
+  }
+  .grid:hover .tile .img { filter: brightness(.6); }
+  .grid .tile:hover .img { filter: brightness(1); transform: scale(1.03); }
+
+  /* ---------- Video ---------- */
+  .video {
+    padding: 140px 28px;
+    color: var(--muted);
+  }
+  .video p { max-width: 40ch; }
+
+  /* ---------- Patička ---------- */
+  footer {
+    padding: 0 28px 28px;
+    display: flex; justify-content: space-between; gap: 24px;
+    color: var(--muted);
+  }
+  footer a { border-bottom: 1px solid var(--line); transition: color .3s, border-color .3s; }
+  footer a:hover { color: var(--text); border-color: var(--text); }
+
+  /* ---------- Lightbox ---------- */
+  .lightbox {
+    position: fixed; inset: 0; z-index: 30;
+    background: var(--bg);
+    opacity: 0; visibility: hidden;
+    transition: opacity .6s var(--ease), visibility 0s .6s;
+  }
+  .lightbox[open] { opacity: 1; visibility: visible; transition: opacity .6s var(--ease); }
+  .lb-layer {
+    position: absolute; inset: 56px 48px;
+    background-size: contain; background-repeat: no-repeat; background-position: center;
+    opacity: 0; transform: scale(.985);
+    transition: opacity .9s var(--ease), transform 1.2s var(--ease);
+  }
+  .lb-layer.on { opacity: 1; transform: none; }
+  .lb-nav { position: absolute; top: 0; bottom: 0; width: 40%; }
+  .lb-nav.prev { left: 0; cursor: w-resize; }
+  .lb-nav.next { right: 0; cursor: e-resize; }
+  .lb-close { position: absolute; top: 22px; right: 28px; color: var(--muted); transition: color .3s; }
+  .lb-close:hover { color: var(--text); }
+  .lb-count { position: absolute; left: 28px; bottom: 22px; color: var(--muted); font-size: 13px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .hero-img, .hero h1 { animation: none; opacity: 1; transform: none; }
+    .tile { opacity: 1; transform: none; transition: none; }
+    .tile .img, .lightbox, .lb-layer { transition: none; }
+  }
+  @media (max-width: 900px) {
+    .grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 600px) {
+    .nav { padding: 18px 16px; }
+    .hero h1 { left: 16px; bottom: 20px; }
+    .grid { grid-template-columns: 1fr; }
+    .tile.tall, .tile.wide { grid-row: auto; grid-column: auto; aspect-ratio: 3/2; }
+    .video { padding: 96px 16px; }
+    footer { padding: 0 16px 20px; flex-direction: column; gap: 8px; }
+    .lb-layer { inset: 56px 12px; }
+    .lb-close { right: 16px; } .lb-count { left: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-name" href="#">Štěpán Bartoš</a>
+  <div class="nav-links">
+    <a href="#video">Video</a>
+    <a href="mailto:stepan@example.cz">Kontakt</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-img" id="heroImg"></div>
+  <h1>Štěpán Bartoš</h1>
+</header>
+
+<div class="grid" id="grid"></div>
+
+<section class="video" id="video">
+  <p>Video přibude během podzimu.</p>
+</section>
+
+<footer>
+  <a href="mailto:stepan@example.cz">stepan@example.cz</a>
+  <a href="https://instagram.com/" target="_blank" rel="noopener">Instagram</a>
+  <span>© 2026</span>
+</footer>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Fotografie">
+  <div class="lb-layer" id="lbA"></div>
+  <div class="lb-layer" id="lbB"></div>
+  <button class="lb-nav prev" id="lbPrev" aria-label="Předchozí"></button>
+  <button class="lb-nav next" id="lbNext" aria-label="Další"></button>
+  <span class="lb-count" id="lbCount"></span>
+  <button class="lb-close" id="lbClose">Zavřít</button>
+</div>
+
+<script>
+/* =====================================================================
+   FOTKY — jediné místo k úpravě.
+   src:   cesta k souboru ("" = placeholder)
+   size:  "" | "tall" | "wide"  — tvar dlaždice v mřížce
+   hero:  true u úvodní fotky
+   ===================================================================== */
+const photos = [
+  { src: "", size: "wide", hero: true },
+  { src: "", size: "tall" },
+  { src: "", size: "" },
+  { src: "", size: "" },
+  { src: "", size: "" },
+  { src: "", size: "tall" },
+  { src: "", size: "wide" },
+  { src: "", size: "" },
+  { src: "", size: "" },
+];
+
+const placeholder = i => {
+  const hues = [[214,26,14],[210,30,10],[222,24,18],[206,20,12]];
+  const [h,s,l] = hues[i % hues.length];
+  return `radial-gradient(60% 40% at ${20+(i*17)%60}% 30%, hsl(30 40% 55% / .35), transparent 70%),
+          linear-gradient(160deg, hsl(${h} ${s}% ${l+16}%) 0%, hsl(${h} ${s}% ${l+6}%) 45%, hsl(${h+8} ${s}% ${l}%) 100%)`;
+};
+const bg = (p, i) => p.src ? `url("${p.src}")` : placeholder(i);
+
+/* Hero */
+const heroIndex = Math.max(0, photos.findIndex(p => p.hero));
+document.getElementById("heroImg").style.backgroundImage = bg(photos[heroIndex], heroIndex);
+
+/* Mřížka */
+const grid = document.getElementById("grid");
+photos.forEach((p, i) => {
+  const b = document.createElement("button");
+  b.className = `tile ${p.size || ""}`;
+  b.setAttribute("aria-label", `Fotografie ${i + 1}`);
+  b.innerHTML = `<div class="img" style="background-image:${bg(p,i)}"></div>`;
+  b.addEventListener("click", () => openLightbox(i));
+  grid.appendChild(b);
+});
+
+/* Postupné objevení při scrollu */
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
+}, { rootMargin: "0px 0px -8% 0px" });
+document.querySelectorAll(".tile").forEach(t => io.observe(t));
+
+/* Lightbox — dvě vrstvy, prolínačka */
+const lb = document.getElementById("lightbox");
+const layers = [document.getElementById("lbA"), document.getElementById("lbB")];
+const count = document.getElementById("lbCount");
+let current = 0, active = 0;
+
+function show(i) {
+  current = (i + photos.length) % photos.length;
+  const next = 1 - active;
+  layers[next].style.backgroundImage = bg(photos[current], current);
+  requestAnimationFrame(() => {
+    layers[next].classList.add("on");
+    layers[active].classList.remove("on");
+    active = next;
+  });
+  count.textContent = `${current + 1} / ${photos.length}`;
+}
+function openLightbox(i) {
+  layers.forEach(l => l.classList.remove("on"));
+  show(i);
+  lb.setAttribute("open", "");
+  document.body.style.overflow = "hidden";
+  document.getElementById("lbClose").focus();
+}
+function closeLightbox() {
+  lb.removeAttribute("open");
+  document.body.style.overflow = "";
+}
+document.getElementById("lbClose").addEventListener("click", closeLightbox);
+document.getElementById("lbPrev").addEventListener("click", () => show(current - 1));
+document.getElementById("lbNext").addEventListener("click", () => show(current + 1));
+document.addEventListener("keydown", e => {
+  if (!lb.hasAttribute("open")) return;
+  if (e.key === "Escape") closeLightbox();
+  if (e.key === "ArrowLeft") show(current - 1);
+  if (e.key === "ArrowRight") show(current + 1);
+});
+</script>
+</body>
+</html>
