@@ -95,23 +95,36 @@
   .grid .tile:hover .img { filter: brightness(1); transform: scale(1.03); }
 
   /* ---------- Video ---------- */
+  /* Celá šířka mřížky, vložené mezi fotky */
   .video {
-    padding: 140px 28px;
-    color: var(--muted);
-  }
-  .video-frame {
-    position: relative; aspect-ratio: 16/9;
-    max-width: 1280px; margin: 0 auto;
+    grid-column: 1 / -1;
+    position: relative; overflow: hidden;
+    aspect-ratio: 16/9; max-height: 100svh;
     background: var(--bg-2);
+    opacity: 0; transform: translateY(14px);
+    transition: opacity 1s var(--ease), transform 1s var(--ease);
   }
-  .video-frame video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
-  .video-caption { max-width: 1280px; margin: 14px auto 0; font-size: 13px; }
-  .video-caption a { border-bottom: 1px solid var(--line); transition: color .3s, border-color .3s; }
+  .video.in { opacity: 1; transform: none; }
+  .video video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+  .video::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(to top, rgba(13,17,23,.8) 0%, rgba(13,17,23,0) 40%);
+  }
+  .video-caption {
+    position: absolute; left: 28px; right: 28px; bottom: 28px; z-index: 1;
+    display: flex; justify-content: space-between; align-items: flex-end; gap: 24px;
+  }
+  .video-title {
+    font-size: clamp(28px, 5vw, 72px);
+    font-weight: 400; line-height: .95; letter-spacing: -.035em;
+  }
+  .video-title small { display: block; margin-top: 10px; font-size: 15px; letter-spacing: 0; color: var(--muted); }
+  .video-caption a { flex: none; color: var(--muted); border-bottom: 1px solid var(--line); transition: color .3s, border-color .3s; }
   .video-caption a:hover { color: var(--text); border-color: var(--text); }
 
   /* ---------- Patička ---------- */
   footer {
-    padding: 0 28px 28px;
+    padding: 96px 28px 28px;
     display: flex; justify-content: space-between; gap: 24px;
     color: var(--muted);
   }
@@ -143,7 +156,7 @@
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     .hero-img, .hero h1 { animation: none; opacity: 1; transform: none; }
-    .tile { opacity: 1; transform: none; transition: none; }
+    .tile, .video { opacity: 1; transform: none; transition: none; }
     .tile .img, .lightbox, .lb-layer { transition: none; }
   }
   @media (max-width: 900px) {
@@ -154,8 +167,9 @@
     .hero h1 { left: 16px; bottom: 20px; }
     .grid { grid-template-columns: 1fr; }
     .tile.tall, .tile.wide { grid-row: auto; grid-column: auto; aspect-ratio: 3/2; }
-    .video { padding: 96px 16px; }
-    footer { padding: 0 16px 20px; flex-direction: column; gap: 8px; }
+    .video { aspect-ratio: 4/5; }
+    .video-caption { left: 16px; right: 16px; bottom: 20px; flex-direction: column; align-items: flex-start; gap: 14px; }
+    footer { padding: 64px 16px 20px; flex-direction: column; gap: 8px; }
     .lb-layer { inset: 56px 12px; }
     .lb-close { right: 16px; } .lb-count { left: 16px; }
   }
@@ -178,16 +192,15 @@
 
 <div class="grid" id="grid"></div>
 
+<!-- Skript video přesune do mřížky za fotku č. 5 (videoAfter níže) -->
 <section class="video" id="video">
-  <div class="video-frame">
-    <video src="video/klip.mp4" poster="video/klip.jpg"
-      autoplay muted loop playsinline preload="metadata"
-      aria-label="Guinness World Record — nejvíc loopingů v kluzáku"></video>
-  </div>
-  <p class="video-caption">
-    Guinness World Record — nejvíc loopingů v kluzáku ·
+  <video id="videoClip" src="video/klip.mp4" poster="video/klip.jpg"
+    muted loop playsinline preload="metadata"
+    aria-label="Guinness World Record — nejvíc loopingů v kluzáku"></video>
+  <div class="video-caption">
+    <h2 class="video-title">Guinness World Record<small>Nejvíc loopingů v kluzáku</small></h2>
     <a href="https://www.youtube.com/watch?v=Ktn5-dTVTmk" target="_blank" rel="noopener">Celé video</a>
-  </p>
+  </div>
 </section>
 
 <footer>
@@ -224,6 +237,9 @@ const photos = [
   { src: "fotky/IMG_1161.jpeg", size: "" },
 ];
 
+/* Za kolikátou fotkou se v mřížce ukáže video */
+const videoAfter = 5;
+
 const placeholder = i => {
   const hues = [[214,26,14],[210,30,10],[222,24,18],[206,20,12]];
   const [h,s,l] = hues[i % hues.length];
@@ -248,13 +264,23 @@ photos.forEach((p, i) => {
   b.appendChild(img);
   b.addEventListener("click", () => openLightbox(i));
   grid.appendChild(b);
+  if (i + 1 === videoAfter) grid.appendChild(document.getElementById("video"));
 });
+
+/* Video hraje od začátku, když doscrolluješ; mimo obrazovku se pozastaví */
+const videoClip = document.getElementById("videoClip");
+if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  new IntersectionObserver(([e]) => {
+    if (e.isIntersecting) { videoClip.currentTime = 0; videoClip.play().catch(() => {}); }
+    else videoClip.pause();
+  }, { threshold: .35 }).observe(videoClip);
+}
 
 /* Postupné objevení při scrollu */
 const io = new IntersectionObserver(entries => {
   entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
 }, { rootMargin: "0px 0px -8% 0px" });
-document.querySelectorAll(".tile").forEach(t => io.observe(t));
+document.querySelectorAll(".tile, .video").forEach(t => io.observe(t));
 
 /* Lightbox — dvě vrstvy, prolínačka */
 const lb = document.getElementById("lightbox");
