@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="cs">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Štěpán Bartoš</title>
-<meta name="description" content="Fotografie Štěpána Bartoše.">
+<meta name="description" content="Photography by Štěpán Bartoš.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500&display=swap" rel="stylesheet">
@@ -115,10 +115,15 @@
     display: flex; justify-content: space-between; align-items: flex-end; gap: 24px;
   }
   .video-title {
-    font-size: clamp(28px, 5vw, 72px);
+    --title-size: clamp(28px, 5vw, 72px);
+    font-size: var(--title-size);
     font-weight: 400; line-height: .95; letter-spacing: -.035em;
   }
-  .video-title small { display: block; margin-top: 10px; font-size: 15px; letter-spacing: 0; color: var(--muted); }
+  /* Odsazení vyrovná levou mezeru velkého „G“, aby podnadpis začínal přesně pod ním */
+  .video-title small {
+    display: block; margin: 10px 0 0 calc(var(--title-size) * .05 - 1.3px);
+    font-size: 15px; letter-spacing: 0; color: var(--muted);
+  }
   .video-caption a { flex: none; color: var(--muted); border-bottom: 1px solid var(--line); transition: color .3s, border-color .3s; }
   .video-caption a:hover { color: var(--text); border-color: var(--text); }
 
@@ -181,7 +186,7 @@
   <a class="nav-name" href="#">Štěpán Bartoš</a>
   <div class="nav-links">
     <a href="#video">Video</a>
-    <a href="mailto:stepanbartos45@gmail.com">Kontakt</a>
+    <a href="mailto:stepanbartos45@gmail.com">Contact</a>
   </div>
 </nav>
 
@@ -196,10 +201,10 @@
 <section class="video" id="video">
   <video id="videoClip" src="video/klip.mp4" poster="video/klip.jpg"
     muted loop playsinline preload="metadata"
-    aria-label="Guinness World Record — nejvíc loopingů v kluzáku"></video>
+    aria-label="Guinness World Record — most loops in a glider"></video>
   <div class="video-caption">
-    <h2 class="video-title">Guinness World Record<small>Nejvíc loopingů v kluzáku</small></h2>
-    <a href="https://www.youtube.com/watch?v=Ktn5-dTVTmk" target="_blank" rel="noopener">Celé video</a>
+    <h2 class="video-title">Guinness World Record<small>Most loops in a glider</small></h2>
+    <a href="https://www.youtube.com/watch?v=Ktn5-dTVTmk" target="_blank" rel="noopener">Full video</a>
   </div>
 </section>
 
@@ -208,13 +213,13 @@
   <span>© 2026</span>
 </footer>
 
-<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Fotografie">
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Photo">
   <div class="lb-layer" id="lbA"></div>
   <div class="lb-layer" id="lbB"></div>
-  <button class="lb-nav prev" id="lbPrev" aria-label="Předchozí"></button>
-  <button class="lb-nav next" id="lbNext" aria-label="Další"></button>
+  <button class="lb-nav prev" id="lbPrev" aria-label="Previous"></button>
+  <button class="lb-nav next" id="lbNext" aria-label="Next"></button>
   <span class="lb-count" id="lbCount"></span>
-  <button class="lb-close" id="lbClose">Zavřít</button>
+  <button class="lb-close" id="lbClose">Close</button>
 </div>
 
 <script>
@@ -257,7 +262,7 @@ const grid = document.getElementById("grid");
 photos.forEach((p, i) => {
   const b = document.createElement("button");
   b.className = `tile ${p.size || ""}`;
-  b.setAttribute("aria-label", `Fotografie ${i + 1}`);
+  b.setAttribute("aria-label", `Photo ${i + 1}`);
   const img = document.createElement("div");
   img.className = "img";
   img.style.backgroundImage = bg(p, i);
